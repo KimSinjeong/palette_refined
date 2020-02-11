@@ -6,3 +6,7 @@
 ---
 ## Prerequisite
 - OpenCV 4.1.0 with Aruco extension
+
+---
+## Branch explanation
+- Reading new camera frame and put it into frame instance.
