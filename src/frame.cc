@@ -14,14 +14,14 @@ bool Frame::setGlobalMarkerPos(float pt[])
         {
             globalframe.setMarker(pt[2*i], pt[2*i+1], i);
         }
-    } catch(std::out_of_range& e){
-        std::cerr << "ERROR : " << e.what() << std::endl;
+    } catch(const std::out_of_range& e){
+        std::cerr << "setGlobalMarkerPos exception: " << e.what() << std::endl;
         return false;
     }
     return true;
 }
 
-bool Frame::setPaperFrameSize(int width, int height)
+void Frame::setPaperFrameSize(int width, int height)
 {
     paperframe.setReferential(cv::Point2f(0.f, 0.f), cv::Point2f((float)width, 0.f),
         cv::Point2f((float)width, (float)height), cv::Point2f(0.f, (float)height));

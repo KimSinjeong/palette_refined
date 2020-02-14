@@ -14,16 +14,63 @@
         3. Global frame based on QR code with ID:41
 */
 
+#include <iostream>
+#include <ros/ros.h>
+#include <cv_bridge/cv_bridge.h>
+
 #include "frame.h"
 
-int main()
+using namespace std;
+
+class ImageGrabber
 {
+public:
+    ImageGrabber(Frame* frame) : mpframe(frame) {}
+
+    void GrabImage(const sensor_msgs::ImageConstPtr& msg);
+
+private:
+    Frame* mpframe;
+}
+
+int main(int argc, char **argv)
+{
+    ros::init(argc, argv, "Palette");
+    ros::start();
+
     // TODO: Run threads
-    do {
-        // TODO: Get current frame via ROS messages.
-    } while(true);
+
+    Frame mainframe;
+
+    ImageGrabber igb(&mainframe);
+
+    ros::NodeHandle nodeHandler;
+    ros::Subscriber sub = nodeHandler.subscribe("/camera/image_raw", 1, &ImageGrabber::GrabImage, &igb);
+
+    ros::spin();
+
+    // TODO: Halt threads
+
+    ros::shutdown();
 
     return 0;
 }
 
-// TODO: Function which get a current camera frame.
+// Function which get a current camera frame.
+void ImageGrabber::GrabImage(const sensor_msgs::ImageConstPtr& msg)
+{
+    // Copy the ros image message to cv::Mat.
+    cv_bridge::CvImageConstPtr cv_ptr;
+    try
+    {
+        cv_ptr = cv_bridge::toCvshare(msg);
+    }
+    catch(const cv_bridge::Exception& e)
+    {
+        ROS_ERROR("cv_bridge exception: %s", e.what());
+        return;
+    }
+    
+    // TODO: Frame에 쓸 때에는 mutex 설정해야 함.
+    mpframe.setFrame(cv_ptr->image);
+}

@@ -14,7 +14,7 @@ public:
     // [x1, y1, x2, ...] 순서로 넘겨줘야 함.
     bool setGlobalMarkerPos(float pt[]);
     // Paper frame의 크기를 얼마로 잡을지 설정하는 함수; 그대로 imageframe의 localpt가 된다.
-    bool setPaperFrameSize(int width, int height);
+    void setPaperFrameSize(int width, int height);
 
 private:
     // Image frame에는 전체 이미지
@@ -47,7 +47,7 @@ public:
     inline cv::Point2f* getMarker() { return markerpt; }
 
     // Setters
-    void setFrame(cv::Mat frame_);
+    inline void setFrame(cv::Mat& frame_) { frame = frame_; }
     void setReferential(std::vector<cv::Point2d> pt_);
     void setReferential(cv::Point2f a, cv::Point2f b, cv::Point2f c, cv::Point2f d);
     void setMarker(std::vector<cv::Point2d> pt_);
