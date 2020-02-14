@@ -15,6 +15,7 @@
 */
 
 #include <iostream>
+#include <thread>
 #include <ros/ros.h>
 #include <cv_bridge/cv_bridge.h>
 
@@ -25,12 +26,13 @@ using namespace std;
 class ImageGrabber
 {
 public:
-    ImageGrabber(Frame* frame) : mpframe(frame) {}
+    ImageGrabber(Frame* frame) : pframe(frame) {}
 
     void GrabImage(const sensor_msgs::ImageConstPtr& msg);
 
 private:
-    Frame* mpframe;
+    Frame* pframe;
+    mutex mreadimage;
 }
 
 int main(int argc, char **argv)
@@ -38,7 +40,15 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "Palette");
     ros::start();
 
+    // TODO: Create classes and Run threads
+    // BoardMonitor boardmonitor = BoardMonitor(...);
+    // Intelligence intelligence = Intelligence(...);
+    // RobotMover robotmover = RobotMover(...);
+
     // TODO: Run threads
+    // thread ptBoardMonitor = thread(...);
+    // thread ptIntelligence = thread(...);
+    // thread ptRobotMover = thread(...);
 
     Frame mainframe;
 
@@ -50,6 +60,9 @@ int main(int argc, char **argv)
     ros::spin();
 
     // TODO: Halt threads
+    // boardmonitor.halt();
+    // intelligence.halt();
+    // robotmover.halt();
 
     ros::shutdown();
 
@@ -71,6 +84,9 @@ void ImageGrabber::GrabImage(const sensor_msgs::ImageConstPtr& msg)
         return;
     }
     
-    // TODO: Frame에 쓸 때에는 mutex 설정해야 함.
-    mpframe.setFrame(cv_ptr->image);
+    // Set mutex when reading an image.
+    {
+        unique_lock<mutex> lock(mreadimage);
+        mpframe.setFrame(cv_ptr->image);
+    }
 }
