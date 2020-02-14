@@ -5,11 +5,11 @@
     Run threads for main works and communicate with robot.
     There are 4 main works :
         1. Get current camera frame and cut square board from it.
-        2. Determine where the user put a stone.
+        2. Determine where the user put a stone. (in paper frame)
         3. Determine where the robot should put a stone. (in global frame)
         4. Move the robot to target points via ROS message.
     There are 3 types of frames : 
-        1. Camera frame (pixel frame)
+        1. Camera frame (in image frame)
         2. Paper frame based on QR code with ID:0
         3. Global frame based on QR code with ID:41
 */
