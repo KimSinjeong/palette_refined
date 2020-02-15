@@ -4,41 +4,10 @@
 #include <opencv2/core.hpp>
 #include <vector>
 
-class Frame
-{
-public:
-    Frame();
-    Frame(cv::Mat image);
-
-    // global marker의 네 꼭짓점의 Global coordinate 기준 좌표를 입력하는 함수.
-    // [x1, y1, x2, ...] 순서로 넘겨줘야 함.
-    bool setGlobalMarkerPos(float pt[]);
-    // Paper frame의 크기를 얼마로 잡을지 설정하는 함수; 그대로 imageframe의 localpt가 된다.
-    void setPaperFrameSize(int width, int height);
-
-private:
-    // Image frame에는 전체 이미지
-    // referentialpt - ID:0의 1번 꼭짓점, 바둑판의 다른 세 꼭짓점의 좌표
-    // markerpt - ID:0의 네 꼭짓점 좌표
-    SubFrame imageframe;
-    // Paper frame에는 바둑판 영역 이미지 (원점)
-    // referentialpt - ID:0의 1번 꼭짓점, 바둑판의 다른 세 꼭짓점의 좌표
-    // markerpt - ID:41의 네 꼭짓점 좌표
-    SubFrame paperframe;
-    // Global frame에는 저장 안함
-    // markerpt - ID:41의 네 꼭짓점 좌표
-    SubFrame globalframe;
-
-    // Perspective transformation matrices
-    cv::Mat imagetopapertf;
-    cv::Mat papertoglobaltf;
-
-};
-
 class SubFrame
 {
 public:
-    SubFrame();
+    SubFrame() { }
     SubFrame(cv::Mat frame_);
 
     // Getters
@@ -67,6 +36,39 @@ private:
     */
     cv::Point2f referentialpt[4];
     cv::Point2f markerpt[4];
+};
+
+class Frame
+{
+public:
+    Frame() { }
+    Frame(cv::Mat image);
+
+    // global marker의 네 꼭짓점의 Global coordinate 기준 좌표를 입력하는 함수.
+    // [x1, y1, x2, ...] 순서로 넘겨줘야 함.
+    bool setGlobalMarkerPos(float pt[]);
+    // Paper frame의 크기를 얼마로 잡을지 설정하는 함수; 그대로 imageframe의 localpt가 된다.
+    void setPaperFrameSize(int width, int height);
+
+    inline void setImage(cv::Mat image) { imageframe.setFrame(image); }
+
+private:
+    // Image frame에는 전체 이미지
+    // referentialpt - ID:0의 1번 꼭짓점, 바둑판의 다른 세 꼭짓점의 좌표
+    // markerpt - ID:0의 네 꼭짓점 좌표
+    SubFrame imageframe;
+    // Paper frame에는 바둑판 영역 이미지 (원점)
+    // referentialpt - ID:0의 1번 꼭짓점, 바둑판의 다른 세 꼭짓점의 좌표
+    // markerpt - ID:41의 네 꼭짓점 좌표
+    SubFrame paperframe;
+    // Global frame에는 저장 안함
+    // markerpt - ID:41의 네 꼭짓점 좌표
+    SubFrame globalframe;
+
+    // Perspective transformation matrices
+    cv::Mat imagetopapertf;
+    cv::Mat papertoglobaltf;
+
 };
 
 #endif

@@ -16,6 +16,7 @@
 
 #include <iostream>
 #include <thread>
+#include <mutex>
 #include <opencv2/core.hpp>
 #include <ros/ros.h>
 #include <cv_bridge/cv_bridge.h>
@@ -34,7 +35,7 @@ public:
 private:
     Frame* pframe;
     mutex mreadimage;
-}
+};
 
 int main(int argc, char **argv)
 {
@@ -51,7 +52,7 @@ int main(int argc, char **argv)
     // thread ptIntelligence = thread(...);
     // thread ptRobotMover = thread(...);
 
-    Frame mainframe;
+    Frame mainframe = Frame();
 
     ImageGrabber igb(&mainframe);
 
@@ -77,7 +78,7 @@ void ImageGrabber::GrabImage(const sensor_msgs::ImageConstPtr& msg)
     cv_bridge::CvImageConstPtr cv_ptr;
     try
     {
-        cv_ptr = cv_bridge::toCvshare(msg);
+        cv_ptr = cv_bridge::toCvShare(msg);
     }
     catch(const cv_bridge::Exception& e)
     {
@@ -88,6 +89,10 @@ void ImageGrabber::GrabImage(const sensor_msgs::ImageConstPtr& msg)
     // Set mutex when reading an image.
     {
         unique_lock<mutex> lock(mreadimage);
-        mpframe.setFrame(cv_ptr->image);
+        pframe->setImage(cv_ptr->image);
+        
+        // For Debug
+        cv::imshow("testImage", cv_ptr->image);
+        cv::waitKey(1);
     }
 }
