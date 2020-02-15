@@ -61,6 +61,13 @@ int main(int argc, char **argv)
 
     ros::spin();
 
+    // TODO: 2/16
+    // 0. Restore palette package and CMakelists.txt file
+    // 1. Try to re-install palette package
+    // 2. Try to remove palette package
+    // 3. Try to remove ROS
+    // https://answers.ros.org/question/257581/how-to-use-arbitrary-version-of-opencv/
+
     // TODO: Halt threads
     // boardmonitor.halt();
     // intelligence.halt();
@@ -90,7 +97,7 @@ void ImageGrabber::GrabImage(const sensor_msgs::ImageConstPtr& msg)
     {
         unique_lock<mutex> lock(mreadimage);
         pframe->setImage(cv_ptr->image);
-        
+
         // For Debug
         cv::imshow("testImage", cv_ptr->image);
         cv::waitKey(1);

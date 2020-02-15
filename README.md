@@ -6,6 +6,7 @@
 ---
 ## Prerequisite
 - OpenCV 4.1.0 with Aruco extension
+- ROS kinetic
 
 ---
 ## Branch explanation
