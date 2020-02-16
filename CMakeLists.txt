@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   rosserial_server
   std_msgs
   sensor_msgs
+  image_transport
 )
 
 find_package(OpenCV 3.2.0 REQUIRED)
@@ -111,7 +112,7 @@ generate_messages(
 catkin_package(
 #  INCLUDE_DIRS include
   LIBRARIES ros_palette
-  CATKIN_DEPENDS cv_bridge message_generation roscpp rosserial_server std_msgs sensor_msgs
+  CATKIN_DEPENDS cv_bridge message_generation roscpp rosserial_server std_msgs sensor_msgs image_transport
 #  DEPENDS system_lib
 )
 
