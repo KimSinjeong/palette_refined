@@ -7,6 +7,7 @@
 ## Prerequisite
 - OpenCV 4.1.0 with Aruco extension
 - ROS kinetic
+- rosserial (sudo apt install ros-kinetic-rosserial-server)
 
 ---
 ## Branch explanation
