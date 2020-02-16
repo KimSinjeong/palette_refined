@@ -11,7 +11,7 @@ int main(int argc, char** argv){
     ros::init(argc, argv, "camera_node");
     ros::NodeHandle nh;
     image_transport::ImageTransport it(nh);
-    image_transport::Publisher pub = it.advertise("cam_pub", 1);
+    image_transport::Publisher pub = it.advertise("/camera/image_raw", 1);
     int cam_device;
     //condition to verify if the camera device was passed as the first
     //terminal parameter "argv[1]" or as the "cam_device" parameter in the .launch.
