@@ -18,6 +18,7 @@
 #include <thread>
 #include <mutex>
 #include <opencv2/core.hpp>
+#include <opencv2/opencv.hpp>
 #include <ros/ros.h>
 #include <cv_bridge/cv_bridge.h>
 
@@ -39,7 +40,7 @@ private:
 
 int main(int argc, char **argv)
 {
-    ros::init(argc, argv, "Palette");
+    ros::init(argc, argv, "ros_palette_node");
     ros::start();
 
     // TODO: Create classes and Run threads
