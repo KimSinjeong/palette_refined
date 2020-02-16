@@ -40,7 +40,7 @@ private:
 
 int main(int argc, char **argv)
 {
-    ros::init(argc, argv, "ros_palette_node");
+    ros::init(argc, argv, "mainframe_node");
     ros::start();
 
     // TODO: Create classes and Run threads
