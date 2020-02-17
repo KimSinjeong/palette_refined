@@ -1,6 +1,7 @@
 #include <ros/ros.h>
 #include <image_transport/image_transport.h>
 #include <opencv2/highgui.hpp>
+#include <opencv2/imgproc.hpp>
 #include <opencv2/core.hpp>
 #include <cv_bridge/cv_bridge.h>
 #include <sstream> // for converting the command line parameter to integer
@@ -48,6 +49,13 @@ int main(int argc, char** argv){
     fsSettings["Camera.p2"] >> p2;
 
     cv::Mat K = (cv::Mat_<double>(3, 3) << fx, 0., cx, 0., fy, cy, 0., 0., 1.);
+    cv::Mat distCoeffs = (cv::Mat_<double>(1, 4) << k1, k2, p1, p2);
+
+    // Image size after undistortion
+    int width, height;
+    fsSettings["Camera.width"] >> width;
+    fsSettings["Camera.height"] >> height;
+    cv::Size imageSize = cv::Size(width, height);
 
     //initialize a VideoCapture variable to get camera data
     cv::VideoCapture cap(cam_device);
@@ -56,12 +64,17 @@ int main(int argc, char** argv){
     cv::Mat frame;
     sensor_msgs::ImagePtr msg;
   
+    cv::Mat map1, map2;
+    cv::initUndistortRectifyMap(K, distCoeffs, cv::Mat(), K, imageSize, cv::CV_32FC1, map1, map2);
+
     while (nh.ok()) {
         cap >> frame;
         //Check if grabbed frame is actually full with some content,
         //then publish the image
         if(!frame.empty()) {
-            // TODO: Apply camera matrix and undistort frame
+            // Apply camera matrix and undistort frame
+            cv::remap(frame, frame, map1, map2, cv::INTER_LINEAR);
+
             msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", frame).toImageMsg();
             pub.publish(msg);
         }
