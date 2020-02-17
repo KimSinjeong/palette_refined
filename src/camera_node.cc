@@ -65,7 +65,7 @@ int main(int argc, char** argv){
     sensor_msgs::ImagePtr msg;
   
     cv::Mat map1, map2;
-    cv::initUndistortRectifyMap(K, distCoeffs, cv::Mat(), K, imageSize, cv::CV_32FC1, map1, map2);
+    cv::initUndistortRectifyMap(K, distCoeffs, cv::Mat(), K, imageSize, CV_32FC1, map1, map2);
 
     while (nh.ok()) {
         cap >> frame;
