@@ -23,3 +23,13 @@ Camera.fps: 30.0
 
 # Color order of the images (0: BGR, 1: RGB. It is ignored if images are grayscale)
 Camera.RGB: 1
+
+# ------------------------------------------------------------------------------------------
+# Board parameters
+# ------------------------------------------------------------------------------------------
+
+# Global marker robot frame coordinate
+Board.p0: [148.9029, 327.8299]
+Board.p1: [198.4039, 306.0657]
+Board.p2: [177.6139, 260.6517]
+Board.p3: [129.4032, 281.4682]

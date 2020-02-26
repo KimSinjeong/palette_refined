@@ -11,22 +11,34 @@ enum Stone
     BLACK
 };
 
+struct Uline {
+    float rho;
+    float theta;
+    int index;
+}
+
+struct Upoint {
+    // 각 위치에 돌이 놓였는지, 누구의 돌이 놓였는지 저장
+    Stone status;
+    // Paperframe 기준으로 격자점 좌표
+    cv::Point2f coord;
+}
+
 class Board
 {
 public:
     Board(int size) : size(size) {}
-    inline void updateStatus(int x, int y, Stone state) { status[x][y] = state; }
+    inline void updateStatus(int x, int y, Stone state) { gridpt.status[x][y] = state; }
     // Determine whether there is a winner; if so, return the color of winner.
     bool isWinner(Stone player);
-    void clearBoard();
+    void clearBoard();    
 
 private:
-    // 각 위치에 돌이 놓였는지, 누구의 돌이 놓였는지 저장
-    Stone status[12][12];
-    // Paperframe 기준으로 격자점 좌표
-    cv::Point2f gridpt[12][12];
+    // 각 격자점의 정보
+    Upoint gridpt[12][12];
     // 바둑판 크기
     int size;
+    
 };
 
 #endif

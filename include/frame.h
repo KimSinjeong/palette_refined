@@ -3,6 +3,7 @@
 
 #include <opencv2/core.hpp>
 #include <vector>
+#include <string>
 
 class SubFrame
 {
@@ -52,6 +53,32 @@ public:
 
     inline void setImage(cv::Mat image) { imageframe.setFrame(image); }
 
+    inline void img2paperRelation() {
+        imagetopapertf = cv::getPerspectiveTransform(imageframe.getReferential(), paperframe.getReferential());
+    }
+
+    inline void global2paperRelation() {
+        papertoglobaltf = cv::getPerspectiveTransform(paperframe.getMarker(), globalframe.getMarker());
+    }
+
+    void calculateRelations(std::vector<cv::Point2f> pBlob);
+
+    // Get the matrix of indicated target Subframe.
+    Mat& getFrame(std::string target);
+
+    // Set size of paperframe
+    inline void setPaperSize(int s) {
+        papersize = s;
+        paperframe.setReferential(cv::Point2f(0, 0), cv::Point2f((float)s, 0),
+            cv::Point2f((float)s, (float)s), cv::Point2f(0, (float)s));
+    }
+
+    inline int getPaperSize() { return papersize; }
+
+    // Perspective transformation matrices
+    cv::Mat imagetopapertf;
+    cv::Mat papertoglobaltf;
+
 private:
     // Image frame에는 전체 이미지
     // referentialpt - ID:0의 1번 꼭짓점, 바둑판의 다른 세 꼭짓점의 좌표
@@ -65,10 +92,9 @@ private:
     // markerpt - ID:41의 네 꼭짓점 좌표
     SubFrame globalframe;
 
-    // Perspective transformation matrices
-    cv::Mat imagetopapertf;
-    cv::Mat papertoglobaltf;
+    int papersize;
 
+    cv::Point2f image2papertr;
 };
 
 #endif
