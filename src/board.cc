@@ -18,14 +18,6 @@ Board::Board(int size_, int marginX_, int marginY_, int marginE_)
 		memset(gridpt[i], 0, sizeof(Upoint)*size);
 	}
 
-	gridline = new Uline*[size];
-	for(int i = 0; i < size; i++)
-	{
-		gridline[i] = new Uline[size];
-		// Initialize memory space.
-		memset(gridline[i], 0, sizeof(Uline)*(size));
-	}
-
 	recentuser = Point2i(-1, -1);
 }
 
@@ -34,9 +26,6 @@ Board::~Board()
 	// Free the memory
 	for(int i = 0; i < size; i++) delete [] gridpt[i];
 	delete [] gridpt;
-
-	for(int i = 0; i < size; i++) delete [] gridline[i];
-	delete [] gridline;
 
 	while (x_lines.size())
 	{

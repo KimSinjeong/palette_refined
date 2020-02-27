@@ -24,7 +24,9 @@
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
 
+#include "monitor.h"
 #include "frame.h"
+#include "board.h"
 
 using namespace std;
 
@@ -45,22 +47,23 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "mainframe_node");
     ros::start();
 
+    Frame mainframe = Frame();
+    mainframe.setPaperSize(/* argument here */);
+    mainframe.getFrame("global").setReferential(/* argument here (clockwise) */);
+
+    // TODO: We should read go board size from setting file and put it in the initializer of Board class
+    // TODO: Also read the margin of go board for better recognition of go stones.
+    Board goboard = Board(/* argument here */);
+
     // TODO: Create classes and Run threads
-    // BoardMonitor boardmonitor = BoardMonitor(...);
+    Monitor monitor = Monitor(&mainframe, &goboard);
     // Intelligence intelligence = Intelligence(...);
     // RobotMover robotmover = RobotMover(...);
 
     // TODO: Run threads
-    // thread ptBoardMonitor = thread(...);
-    // thread ptIntelligence = thread(...);
-    // thread ptRobotMover = thread(...);
-
-    // TODO: We should read go board size from setting file and put it in the initializer of Board class
-    // TODO: Also read the margin of go board for better recognition of go stones.
-
-    Frame mainframe = Frame();
-    mainframe.setPaperSize(/* argument here */);
-    mainframe.getFrame("global").setReferential(/* argument here (clockwise) */);
+    thread tMonitor = thread(&Monitor::Run, &monitor);
+    // thread tIntelligence = thread(...);
+    // thread tRobotMover = thread(...);
 
     ImageGrabber igb(&mainframe);
 
@@ -74,9 +77,11 @@ int main(int argc, char **argv)
     // https://answers.ros.org/question/257581/how-to-use-arbitrary-version-of-opencv/
 
     // TODO: Halt threads
-    // boardmonitor.halt();
+    monitor.Halt();
     // intelligence.halt();
     // robotmover.halt();
+
+    tMonitor.join();
 
     ros::shutdown();
 

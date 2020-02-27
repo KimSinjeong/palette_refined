@@ -30,7 +30,7 @@ class Board
 {
 public:
     Board(int size_, int marginX_, int marginY_, int marginE_);
-    inline void updateStatus(int x, int y, Stone state) { gridpt.status[x][y] = state; }
+    //inline void updateStatus(int x, int y, Stone state) { gridpt[x][y].status = state; }
     void insert(float, float);
 
     // Find lines and points on the frame
@@ -51,21 +51,22 @@ public:
     ~Board();
 
 private:
-    // 각 격자점의 정보
+    // Information of each points at the go board grid
     Upoint **gridpt;
-    // 바둑판 격자 선
-    Uline **gridline;
-    // 바둑판 크기
+    // Size of Go board
     int size;
 
+    // Frame without unecessary parts at the corners (see marginS and marginE)
     cv::Mat baseframe;
 
+    // Margin of frame to remove a marker and pieces of points at the corners
     cv::Point2i marginS, marginE;
 
     // 최근에 둔 돌이 완전히 처리되고 나면 -1, -1 이 된다.
     cv::Point2i recentuser;
 
     // Lines that are parallel to x axis, y axis, respectively.
+    // (Array of lines that are composing grid)
     std::vector<Uline*> x_lines;
 	std::vector<Uline*> y_lines;
 

@@ -16,7 +16,7 @@ public:
 private:
     Frame* pframe;
     Board* pboard;
-    std::mutex mrunthread;
+
     bool isrunning;
 
     bool isMarker();

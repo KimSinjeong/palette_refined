@@ -4,12 +4,16 @@
 #include <opencv2/core.hpp>
 #include <vector>
 #include <string>
+#include <mutex>
 
 class SubFrame
 {
 public:
     SubFrame() { }
     SubFrame(cv::Mat frame_);
+
+    // Mutexes for accessing syncronization
+    std::mutex mframe, mmarker, mreferential;
 
     // Getters
     inline cv::Mat& getFrame() { return frame; }
@@ -43,7 +47,7 @@ class Frame
 {
 public:
     Frame() { }
-    Frame(cv::Mat image);
+    Frame(cv::Mat image) : imageframe(image) { }
 
     // global marker의 네 꼭짓점의 Global coordinate 기준 좌표를 입력하는 함수.
     // [x1, y1, x2, ...] 순서로 넘겨줘야 함.
@@ -75,11 +79,6 @@ public:
 
     inline int getPaperSize() { return papersize; }
 
-    // Perspective transformation matrices
-    cv::Mat imagetopapertf;
-    cv::Mat papertoglobaltf;
-
-private:
     // Image frame에는 전체 이미지
     // referentialpt - ID:0의 1번 꼭짓점, 바둑판의 다른 세 꼭짓점의 좌표
     // markerpt - ID:0의 네 꼭짓점 좌표
@@ -92,9 +91,15 @@ private:
     // markerpt - ID:41의 네 꼭짓점 좌표
     SubFrame globalframe;
 
+
+private:
     int papersize;
 
     cv::Point2f image2papertr;
+
+    // Perspective transformation matrices
+    cv::Mat imagetopapertf;
+    cv::Mat papertoglobaltf;
 };
 
 #endif

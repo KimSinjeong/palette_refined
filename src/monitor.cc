@@ -200,20 +200,19 @@ void Monitor::Run()
 {
     // Keep the position of the most current stone.
     // Update the board when needed. (setting the mutex)
-    {
-        unique_lock<mutex> lock(mrunthread);
-        misrunning = true;
-    }
+    isrunning = true;
+
     while(isrunning)
     {
         Mat paperQR2Rect;
         std::vector<cv::Point2f> pBlob(4);
         {
-            unique_lock<mutex> lock(/*여기에 mutex 이름 넣기*/);
-            Mat imageframe = (pframe->getFrame("image")).clone();
+            std::unique_lock<std::mutex> lock(pframe->imageframe.mframe);
+            Mat imageframe = (pframe->imageframe.getFrame()).clone();
         }
-        // Marker 및 바둑판 꼭짓점이 일정 개수 인식이 된다면
-        // The order of two evaluations are important!
+        // There are proper number of markers and corners of Go board;
+        //  the order of two evaluations are important!
+        // TODO: 첫번째 조건으로 AI 활동 여부 등의 조건을 나타내는 boolean이 들어가야 함. (pgame->ismonitoractive)
         if (isMarker(imageframe, paperQR2Rect) && isCorner(imageframe, paperQR2Rect, pBlob))
         {
             // Set img <-> paper <-> global relations
@@ -235,12 +234,12 @@ void Monitor::Run()
         else std::cerr << "There are too many/less markers/corners on image." << std::endl;
         
     } // 한 판이 끝나면 종료된다.
-    Halt();
 }
 
+// 외부에서 이 함수가 불리면 Monitor가 종료된다.
 void Monitor::Halt()
 {
-    misrunning = false;
+    isrunning = false;
 }
 
 // If proper number of markers are detected, return true.
@@ -280,14 +279,14 @@ bool Monitor::isMarker(Mat imageframe, Mat& paperQR2Rect)
     {
         if (markerID[i] == 0) {
             {
-                unique_lock<mutex> lock(/*여기에 mutex 이름 넣기*/);
-                (pframe->getFrame("image")).setMarker(validMarkers[i]);
+                std::unique_lock<std::mutex> lock(pframe->imageframe.mmarker);
+                (pframe->imageframe.getFrame()).setMarker(validMarkers[i]);
             }
             paperQR2Rect = perspectiveTF[i].clone();
         }
         else {
-            unique_lock<mutex> lock(/*여기에 mutex 이름 넣기*/);
-            (pframe->getFrame("paper")).setMarker(validMarkers[i]);
+            std::unique_lock<std::mutex> lock(pframe->paperframe.mmarker);
+            (pframe->paperframe.getFrame()).setMarker(validMarkers[i]);
         }
     }
 

@@ -3,12 +3,6 @@
 
 #include <opencv2/imgproc.hpp>
 
-Frame::Frame(cv::Mat image) : imageframe(image)
-{
-    // TODO: 들어온 이미지에서 마커 및 바둑판 꼭짓점 검출 등의 작업이 이루어져야 함
-    // Caution: 위에서 언급한 작업이 main에서 이뤄지는 편이 타당할 수도 있음
-}
-
 bool Frame::setGlobalMarkerPos(float pt[])
 {
     try {
@@ -27,18 +21,6 @@ void Frame::setPaperFrameSize(int width, int height)
 {
     paperframe.setReferential(cv::Point2f(0.f, 0.f), cv::Point2f((float)width, 0.f),
         cv::Point2f((float)width, (float)height), cv::Point2f(0.f, (float)height));
-}
-
-Mat& Frame::getFrame(std::string target) {
-    if (!target.compare(std::string("image"))) {
-        return imageframe.getFrame();
-    }
-    else if (!target.compare(std::string("paper"))) {
-        return paperframe.getFrame();
-    }
-    else {
-        return globalframe.getFrame();
-    }
 }
 
 void Frame::calculateRelations(std::vector<cv::Point2f>& pBlob)
