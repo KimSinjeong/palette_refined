@@ -9,8 +9,37 @@ using namespace cv;
 
 Mat dictionary = Mat(250, (6 * 6 + 7) / 8, CV_8UC4, (uchar*)DICT_6X6_1000_BYTES);
 
+Mat getByteListFromBits(const Mat& bits)
+{
+	// integer ceil
+	int nbytes = (bits.cols * bits.rows + 8 - 1) / 8;
+
+	Mat candidateByteList(1, nbytes, CV_8UC1, Scalar::all(0));
+	unsigned char currentBit = 0;
+	int currentByte = 0;
+
+	uchar* rot0 = candidateByteList.ptr();
+	for (int row = 0; row < bits.rows; row++) {
+		for (int col = 0; col < bits.cols; col++) {
+			// circular shift
+			rot0[currentByte] <<= 1;
+
+			// set bit
+			rot0[currentByte] |= bits.at<uchar>(row, col);
+			currentBit++;
+			if (currentBit == 8) {
+				// next byte
+				currentBit = 0;
+				currentByte++;
+			}
+		}
+	}
+	return candidateByteList;
+}
+
 // Hamming distance를 이용해 어떤 QR코드인지 알아내는 함수
-bool identify(const Mat& onlyBits, int& idx, int& rotation) {
+bool identify(const Mat& onlyBits, int& idx, int& rotation)
+{
 	int markerSize = 6;
 	//비트 매트릭스를 바이트 리스트로 변환합니다. 
 	Mat candidateBytes = getByteListFromBits(onlyBits);
@@ -189,9 +218,19 @@ void Monitor::Run()
         {
             // Set img <-> paper <-> global relations
             pframe->calculateRelations(pBlob);
-            // TODO: Detect the recent stone by user
-
-
+            // Hough transform for line detection
+            if (!pboard->houghDetection()) break;
+            // Find intersections of lines (candidates of go stones' location)
+            pboard->findIntersections();
+            // Find the most recent stone of user.
+            if(pboard->dotDetection()){
+                // TODO: 여기에서 game thread에 user action update signal 보내기.
+		        // game thread에서 뭔가 처리중에 그 signal이 들어오면 반칙처리.
+                /*
+                unique_lock<mutex> lock(<<lock 이름 넣기>>);
+                pgame->userupdated++;
+                 */
+            }
         }
         else std::cerr << "There are too many/less markers/corners on image." << std::endl;
         
@@ -201,8 +240,7 @@ void Monitor::Run()
 
 void Monitor::Halt()
 {
-
-
+    misrunning = false;
 }
 
 // If proper number of markers are detected, return true.
@@ -303,7 +341,6 @@ bool Monitor::isCorner(Mat imageframe, const Mat paperQR2Rect, std::vector<cv::P
         ptf[i] = keypoints[i].pt;
     perspectiveTransform(ptf, ptf, paperQR2Rect);
     
-    Point2f p_o_blob = (pframe->getFrame("image")).getMarker()[0];
     Point2f p_x_blob, p_y_blob, p_xy_blob;
     float xval = -1.0f;
     float yval = -1.0f;
@@ -325,7 +362,7 @@ bool Monitor::isCorner(Mat imageframe, const Mat paperQR2Rect, std::vector<cv::P
         }
     }
     
-    pBlob[0] = p_o_blob; pBlob[1] = p_x_blob; pBlob[2] = p_xy_blob; pBlob[3] = p_y_blob;
+    pBlob[1] = p_x_blob; pBlob[2] = p_xy_blob; pBlob[3] = p_y_blob;
 
     return true;
 }

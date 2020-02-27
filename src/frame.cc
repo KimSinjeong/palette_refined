@@ -44,6 +44,7 @@ Mat& Frame::getFrame(std::string target) {
 void Frame::calculateRelations(std::vector<cv::Point2f>& pBlob)
 {
     // image to paper tf 구하기
+    pBlob[0] = imageframe.getMarker()[0];
     imageframe.setReferential(pBlob);
     img2paperRelation();
 

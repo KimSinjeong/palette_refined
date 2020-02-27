@@ -55,7 +55,12 @@ int main(int argc, char **argv)
     // thread ptIntelligence = thread(...);
     // thread ptRobotMover = thread(...);
 
+    // TODO: We should read go board size from setting file and put it in the initializer of Board class
+    // TODO: Also read the margin of go board for better recognition of go stones.
+
     Frame mainframe = Frame();
+    mainframe.setPaperSize(/* argument here */);
+    mainframe.getFrame("global").setReferential(/* argument here (clockwise) */);
 
     ImageGrabber igb(&mainframe);
 
