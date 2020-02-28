@@ -2,13 +2,20 @@
 #define FRAME_H
 
 #include <opencv2/core.hpp>
+#include <opencv2/imgproc.hpp>
+
 #include <vector>
+#include <string>
+#include <mutex>
 
 class SubFrame
 {
 public:
     SubFrame() { }
     SubFrame(cv::Mat frame_);
+
+    // Mutexes for accessing syncronization
+    std::mutex mframe, mmarker, mreferential;
 
     // Getters
     inline cv::Mat& getFrame() { return frame; }
@@ -17,9 +24,9 @@ public:
 
     // Setters
     inline void setFrame(cv::Mat& frame_) { frame = frame_; }
-    void setReferential(std::vector<cv::Point2d> pt_);
+    void setReferential(std::vector<cv::Point2f> pt_);
     void setReferential(cv::Point2f a, cv::Point2f b, cv::Point2f c, cv::Point2f d);
-    void setMarker(std::vector<cv::Point2d> pt_);
+    void setMarker(std::vector<cv::Point2f> pt_);
     void setMarker(cv::Point2f a, cv::Point2f b, cv::Point2f c, cv::Point2f d);
     inline void setMarker(float x, float y, int idx) { markerpt[idx] = cv::Point2f(x, y); }
 
@@ -42,7 +49,7 @@ class Frame
 {
 public:
     Frame() { }
-    Frame(cv::Mat image);
+    Frame(cv::Mat image) : imageframe(image) { }
 
     // global marker의 네 꼭짓점의 Global coordinate 기준 좌표를 입력하는 함수.
     // [x1, y1, x2, ...] 순서로 넘겨줘야 함.
@@ -52,7 +59,25 @@ public:
 
     inline void setImage(cv::Mat image) { imageframe.setFrame(image); }
 
-private:
+    inline void img2paperRelation() {
+        imagetopapertf = cv::getPerspectiveTransform(imageframe.getReferential(), paperframe.getReferential());
+    }
+
+    inline void paper2globalRelation() {
+        papertoglobaltf = cv::getPerspectiveTransform(paperframe.getMarker(), globalframe.getMarker());
+    }
+
+    void calculateRelations(std::vector<cv::Point2f>& pBlob);
+
+    // Set size of paperframe
+    inline void setPaperSize(int s) {
+        papersize = s;
+        paperframe.setReferential(cv::Point2f(0, 0), cv::Point2f((float)s, 0),
+            cv::Point2f((float)s, (float)s), cv::Point2f(0, (float)s));
+    }
+
+    inline int getPaperSize() { return papersize; }
+
     // Image frame에는 전체 이미지
     // referentialpt - ID:0의 1번 꼭짓점, 바둑판의 다른 세 꼭짓점의 좌표
     // markerpt - ID:0의 네 꼭짓점 좌표
@@ -65,10 +90,15 @@ private:
     // markerpt - ID:41의 네 꼭짓점 좌표
     SubFrame globalframe;
 
+
+private:
+    int papersize;
+
+    cv::Point2f image2papertr;
+
     // Perspective transformation matrices
     cv::Mat imagetopapertf;
     cv::Mat papertoglobaltf;
-
 };
 
 #endif
