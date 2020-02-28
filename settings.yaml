@@ -28,6 +28,17 @@ Camera.RGB: 1
 # Board parameters
 # ------------------------------------------------------------------------------------------
 
+# Paper frame size
+Paper.size: 300
+
+# Paper frame margin for base frame
+Paper.marginX: 20
+Paper.marginY: 40
+Paper.marginE: 40
+
+# Board size
+Board.size: 12
+
 # Global marker robot frame coordinate
 Board.p0: [148.9029, 327.8299]
 Board.p1: [198.4039, 306.0657]

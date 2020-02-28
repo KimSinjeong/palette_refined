@@ -67,9 +67,6 @@ public:
 
     void calculateRelations(std::vector<cv::Point2f> pBlob);
 
-    // Get the matrix of indicated target Subframe.
-    cv::Mat& getFrame(std::string target);
-
     // Set size of paperframe
     inline void setPaperSize(int s) {
         papersize = s;

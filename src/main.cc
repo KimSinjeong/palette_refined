@@ -17,6 +17,8 @@
 #include <iostream>
 #include <thread>
 #include <mutex>
+#include <vector>
+
 #include <opencv2/core.hpp>
 #include <opencv2/opencv.hpp>
 
@@ -47,15 +49,32 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "mainframe_node");
     ros::start();
 
+    // Read arguments
+    cv::FileStorage fsSettings(argv[1], cv::FileStorage::READ);
+    if (!fsSettings.isOpened()) {
+        std::cerr << "Wrong path to settings" << std::endl;
+        return 1;
+    }
+
+    int papersize, marginx, marginy, margine, boardsize;
+    vector<cv::Point2f> globalmarker(4);
+    fsSettings["Paper.size"] >> papersize; fsSettings["Board.size"] >> boardsize;
+    fsSettings["Paper.marginX"] >> marginx; fsSettings["Paper.marginY"] >> marginy;
+    fsSettings["Paper.marginE"] >> margine;
+    
+    fsSettings["Board.p0"] >> globalmarker[0];
+    fsSettings["Board.p1"] >> globalmarker[1];
+    fsSettings["Board.p2"] >> globalmarker[2];
+    fsSettings["Board.p3"] >> globalmarker[3];
+
+    // Initialize objects
     Frame mainframe;
-    mainframe.setPaperSize(/* argument here */);
-    mainframe.getFrame("global").setReferential(/* argument here (clockwise) */);
+    mainframe.setPaperSize(papersize);
+    mainframe.globalframe.setReferential(globalmarker);
 
-    // TODO: We should read go board size from setting file and put it in the initializer of Board class
-    // TODO: Also read the margin of go board for better recognition of go stones.
-    Board goboard(/* argument here */);
+    Board goboard(boardsize, marginx, marginy, margine);
 
-    // TODO: Create classes and Run threads
+    // TODO: Create classes
     Monitor monitor(&mainframe, &goboard);
     // Intelligence intelligence = Intelligence(...);
     // RobotMover robotmover = RobotMover(...);
