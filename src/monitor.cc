@@ -1,9 +1,11 @@
 #include "monitor.h"
 
 #include <string>
-#include <vector>
+
+#include <opencv2/core/hal/hal.hpp>
 #include <opencv2/aruco.hpp>
-#include <predefined_diectionaries.hpp>
+#include <opencv2/features2d.hpp>
+#include <predefined_dictionaries.hpp>
 
 using namespace cv;
 
@@ -148,7 +150,7 @@ void decodePattern2Bits(const Mat& frame, std::vector<std::vector<Point2f>>& mar
 
         //검은색 태두리로 둘러쌓여 있는 것만 체크한다.
         if (white_cell_count == 0) {
-            detectedMarkers.push_back(m);
+            detectedMarkers.push_back(marker[i]);
 
             // 내부 6x6에 있는 정보를 비트로 저장하기 위한 변수
             Mat bitMatrix = Mat::zeros(6, 6, CV_8UC1);
@@ -173,8 +175,8 @@ void decodePattern2Bits(const Mat& frame, std::vector<std::vector<Point2f>>& mar
     }
 }
 
-void matchMarkersID(std::vector<std::vector<Point2f>>& detectedMarkers, std::vector<Mat>& bitMatrice
-        std::vector<int>& markerID, std::vector<std::vector<Point2f>>& validMarkers, std::vector<Mat>& perspectiveTF)
+void matchMarkersID(std::vector<std::vector<Point2f>>& detectedMarkers, std::vector<Mat>& bitMatrices,
+        std::vector<std::vector<Point2f>>& validMarkers, std::vector<int>& markerID, std::vector<Mat>& perspectiveTF)
 {
     int ptfIdx = 0;
     for (int i = 0; i < detectedMarkers.size(); i++)
@@ -192,7 +194,7 @@ void matchMarkersID(std::vector<std::vector<Point2f>>& detectedMarkers, std::vec
             validMarkers.push_back(m);
             ptfIdx++;
         }
-        else perspectiveTF.erase(vec.begin() + ptfIdx);
+        else perspectiveTF.erase(perspectiveTF.begin() + ptfIdx);
     }
 }
 
@@ -204,11 +206,11 @@ void Monitor::Run()
 
     while(isrunning)
     {
-        Mat paperQR2Rect;
+        Mat paperQR2Rect, imageframe;
         std::vector<cv::Point2f> pBlob(4);
         {
             std::unique_lock<std::mutex> lock(pframe->imageframe.mframe);
-            Mat imageframe = (pframe->imageframe.getFrame()).clone();
+            imageframe = (pframe->imageframe.getFrame()).clone();
         }
         // There are proper number of markers and corners of Go board;
         //  the order of two evaluations are important!
@@ -280,13 +282,13 @@ bool Monitor::isMarker(Mat imageframe, Mat& paperQR2Rect)
         if (markerID[i] == 0) {
             {
                 std::unique_lock<std::mutex> lock(pframe->imageframe.mmarker);
-                (pframe->imageframe.getFrame()).setMarker(validMarkers[i]);
+                pframe->imageframe.setMarker(validMarkers[i]);
             }
             paperQR2Rect = perspectiveTF[i].clone();
         }
         else {
             std::unique_lock<std::mutex> lock(pframe->paperframe.mmarker);
-            (pframe->paperframe.getFrame()).setMarker(validMarkers[i]);
+            pframe->paperframe.setMarker(validMarkers[i]);
         }
     }
 

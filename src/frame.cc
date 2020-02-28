@@ -38,7 +38,9 @@ void Frame::calculateRelations(std::vector<cv::Point2f>& pBlob)
     std::vector<cv::Point2f> src(gmarker, gmarker+4);
 
     // paper to global tf 구하기
-    perspectiveTransform(src, gmarker, imagetopapertf);
+    std::vector<cv::Point2f> dst(4);
+    perspectiveTransform(src, dst, imagetopapertf);
+    paperframe.setMarker(dst);
     paper2globalRelation();
 }
 

@@ -63,7 +63,7 @@ public:
         imagetopapertf = cv::getPerspectiveTransform(imageframe.getReferential(), paperframe.getReferential());
     }
 
-    inline void global2paperRelation() {
+    inline void paper2globalRelation() {
         papertoglobaltf = cv::getPerspectiveTransform(paperframe.getMarker(), globalframe.getMarker());
     }
 

@@ -1,6 +1,8 @@
 #include "board.h"
 
 #include <opencv2/imgproc.hpp>
+#include <opencv2/features2d.hpp>
+
 #include <vector>
 #include <algorithm>
 
@@ -48,7 +50,9 @@ void Board::insert(float rho, float theta)
 		rho = -rho;
 	}
 
-	Uline* new_line = new Uline { rho, theta };
+	Uline* new_line = new Uline;
+	new_line->rho = rho; new_line->theta = theta;
+
 	if (new_line->theta > (CV_PI / 4)) {
 		x_lines.push_back(new_line);
 	}
@@ -141,7 +145,7 @@ void Board::findIntersections()
 			a2 = -x0_j / y0_j;
 			b2 = y0_j - a2 * x0_j;
 			gridpt[i][j].coord.x = (b2 - b1) / (a1 - a2);
-			points[i][j].coord.y = a1 * gridpt[i][j].coord.x + b1;
+			gridpt[i][j].coord.y = a1 * gridpt[i][j].coord.x + b1;
 		}
 	}
 }
@@ -211,7 +215,7 @@ bool Board::dotDetection()
 	int index = size*size;
 	int x, y;
 	for (int i = 0; i < blobPoints.size(); i++) {
-		if ((index = findDotIndex(points, blobPoints.at(i))) != size*size)
+		if ((index = findDotIndex(blobPoints.at(i))) != size*size)
 		{
 			x = index / size;
 			y = index % size;

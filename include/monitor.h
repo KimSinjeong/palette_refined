@@ -3,7 +3,9 @@
 
 #include "frame.h"
 #include "board.h"
+
 #include <mutex>
+#include <vector>
 
 class Monitor
 {
@@ -19,8 +21,8 @@ private:
 
     bool isrunning;
 
-    bool isMarker();
-    bool isCorner();
+    bool isMarker(cv::Mat, cv::Mat&);
+    bool isCorner(cv::Mat, const cv::Mat, std::vector<cv::Point2f>&);
 };
 
 #endif
