@@ -12,6 +12,6 @@
 ---
 ## Current status
 - [x] Receiving image from camera
-- [ ] Sending control signal to OpenCM board
-- [ ] Recognize where the user put on a stone
+- [ ] Sending control signal to OpenCM board	
+- [x] Recognize where the user put on a stone	
 - [ ] Implementing artificial intelligence

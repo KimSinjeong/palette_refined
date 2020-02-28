@@ -5,21 +5,42 @@
 # ------------------------------------------------------------------------------------------
 
 # Camera calibration and distortion parameters (OpenCV)
-Camera.fx: 1448.397
-Camera.fy: 1451.642
-Camera.cx: 574.415
-Camera.cy: 409.574
+Camera.fx: 703.269
+Camera.fy: 701.809
+Camera.cx: 307.127
+Camera.cy: 237.118
 
-Camera.k1: 0.051924
-Camera.k2: -0.084874
-Camera.p1: -0.004236
-Camera.p2: 0.009268
+Camera.k1: 0.103039
+Camera.k2: -0.759932
+Camera.p1: 0.001632
+Camera.p2: -0.005473
 
-Camera.width: 1024
-Camera.height: 768
+Camera.width: 640
+Camera.height: 480
 
 # Camera frames per second 
 Camera.fps: 30.0
 
 # Color order of the images (0: BGR, 1: RGB. It is ignored if images are grayscale)
 Camera.RGB: 1
+
+# ------------------------------------------------------------------------------------------
+# Board parameters
+# ------------------------------------------------------------------------------------------
+
+# Paper frame size
+Paper.size: 300
+
+# Paper frame margin for base frame
+Paper.marginX: 20
+Paper.marginY: 40
+Paper.marginE: 40
+
+# Board size
+Board.size: 12
+
+# Global marker robot frame coordinate
+Board.p0: [148.9029, 327.8299]
+Board.p1: [198.4039, 306.0657]
+Board.p2: [177.6139, 260.6517]
+Board.p3: [129.4032, 281.4682]

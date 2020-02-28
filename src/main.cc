@@ -17,6 +17,8 @@
 #include <iostream>
 #include <thread>
 #include <mutex>
+#include <vector>
+
 #include <opencv2/core.hpp>
 #include <opencv2/opencv.hpp>
 
@@ -24,7 +26,9 @@
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
 
+#include "monitor.h"
 #include "frame.h"
+#include "board.h"
 
 using namespace std;
 
@@ -45,17 +49,40 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "mainframe_node");
     ros::start();
 
-    // TODO: Create classes and Run threads
-    // BoardMonitor boardmonitor = BoardMonitor(...);
+    // Read arguments
+    cv::FileStorage fsSettings(argv[1], cv::FileStorage::READ);
+    if (!fsSettings.isOpened()) {
+        std::cerr << "Wrong path to settings" << std::endl;
+        return 1;
+    }
+
+    int papersize, marginx, marginy, margine, boardsize;
+    vector<cv::Point2f> globalmarker(4);
+    fsSettings["Paper.size"] >> papersize; fsSettings["Board.size"] >> boardsize;
+    fsSettings["Paper.marginX"] >> marginx; fsSettings["Paper.marginY"] >> marginy;
+    fsSettings["Paper.marginE"] >> margine;
+    
+    fsSettings["Board.p0"] >> globalmarker[0];
+    fsSettings["Board.p1"] >> globalmarker[1];
+    fsSettings["Board.p2"] >> globalmarker[2];
+    fsSettings["Board.p3"] >> globalmarker[3];
+
+    // Initialize objects
+    Frame mainframe;
+    mainframe.setPaperSize(papersize);
+    mainframe.globalframe.setReferential(globalmarker);
+
+    Board goboard(boardsize, marginx, marginy, margine);
+
+    // TODO: Create classes
+    Monitor monitor(&mainframe, &goboard);
     // Intelligence intelligence = Intelligence(...);
     // RobotMover robotmover = RobotMover(...);
 
     // TODO: Run threads
-    // thread ptBoardMonitor = thread(...);
-    // thread ptIntelligence = thread(...);
-    // thread ptRobotMover = thread(...);
-
-    Frame mainframe = Frame();
+    thread tMonitor = thread(&Monitor::Run, &monitor);
+    // thread tIntelligence = thread(...);
+    // thread tRobotMover = thread(...);
 
     ImageGrabber igb(&mainframe);
 
@@ -69,9 +96,11 @@ int main(int argc, char **argv)
     // https://answers.ros.org/question/257581/how-to-use-arbitrary-version-of-opencv/
 
     // TODO: Halt threads
-    // boardmonitor.halt();
+    monitor.Halt();
     // intelligence.halt();
     // robotmover.halt();
+
+    tMonitor.join();
 
     ros::shutdown();
 

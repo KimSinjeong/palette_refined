@@ -1,11 +1,7 @@
 #include "frame.h"
 #include <iostream>
 
-Frame::Frame(cv::Mat image) : imageframe(image)
-{
-    // TODO: 들어온 이미지에서 마커 및 바둑판 꼭짓점 검출 등의 작업이 이루어져야 함
-    // Caution: 위에서 언급한 작업이 main에서 이뤄지는 편이 타당할 수도 있음
-}
+#include <opencv2/imgproc.hpp>
 
 bool Frame::setGlobalMarkerPos(float pt[])
 {
@@ -27,10 +23,30 @@ void Frame::setPaperFrameSize(int width, int height)
         cv::Point2f((float)width, (float)height), cv::Point2f(0.f, (float)height));
 }
 
+void Frame::calculateRelations(std::vector<cv::Point2f>& pBlob)
+{
+    // image to paper tf 구하기
+    pBlob[0] = imageframe.getMarker()[0];
+    imageframe.setReferential(pBlob);
+    img2paperRelation();
+
+    warpPerspective(imageframe.getFrame(), paperframe.getFrame(),
+            imagetopapertf, cv::Size(getPaperSize(), getPaperSize()));
+
+    // This array is length 4
+    cv::Point2f* gmarker = paperframe.getMarker();
+    std::vector<cv::Point2f> src(gmarker, gmarker+4);
+
+    // paper to global tf 구하기
+    std::vector<cv::Point2f> dst(4);
+    perspectiveTransform(src, dst, imagetopapertf);
+    paperframe.setMarker(dst);
+    paper2globalRelation();
+}
+
 SubFrame::SubFrame(cv::Mat frame_) : frame(frame_) {}
 
-
-void SubFrame::setReferential(std::vector<cv::Point2d> pt_)
+void SubFrame::setReferential(std::vector<cv::Point2f> pt_)
 {
     for(int i = 3; i >= 0; i--)
     {
@@ -44,7 +60,7 @@ void SubFrame::setReferential(cv::Point2f a, cv::Point2f b, cv::Point2f c, cv::P
     referentialpt[0] = a; referentialpt[1] = b; referentialpt[2] = c; referentialpt[3] = d;
 }
 
-void SubFrame::setMarker(std::vector<cv::Point2d> pt_)
+void SubFrame::setMarker(std::vector<cv::Point2f> pt_)
 {
     for(int i = 3; i >= 0; i--)
     {
