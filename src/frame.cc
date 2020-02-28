@@ -44,7 +44,7 @@ void Frame::calculateRelations(std::vector<cv::Point2f>& pBlob)
 
 SubFrame::SubFrame(cv::Mat frame_) : frame(frame_) {}
 
-void SubFrame::setReferential(std::vector<cv::Point2d> pt_)
+void SubFrame::setReferential(std::vector<cv::Point2f> pt_)
 {
     for(int i = 3; i >= 0; i--)
     {
@@ -58,7 +58,7 @@ void SubFrame::setReferential(cv::Point2f a, cv::Point2f b, cv::Point2f c, cv::P
     referentialpt[0] = a; referentialpt[1] = b; referentialpt[2] = c; referentialpt[3] = d;
 }
 
-void SubFrame::setMarker(std::vector<cv::Point2d> pt_)
+void SubFrame::setMarker(std::vector<cv::Point2f> pt_)
 {
     for(int i = 3; i >= 0; i--)
     {

@@ -22,9 +22,9 @@ public:
 
     // Setters
     inline void setFrame(cv::Mat& frame_) { frame = frame_; }
-    void setReferential(std::vector<cv::Point2d> pt_);
+    void setReferential(std::vector<cv::Point2f> pt_);
     void setReferential(cv::Point2f a, cv::Point2f b, cv::Point2f c, cv::Point2f d);
-    void setMarker(std::vector<cv::Point2d> pt_);
+    void setMarker(std::vector<cv::Point2f> pt_);
     void setMarker(cv::Point2f a, cv::Point2f b, cv::Point2f c, cv::Point2f d);
     inline void setMarker(float x, float y, int idx) { markerpt[idx] = cv::Point2f(x, y); }
 
