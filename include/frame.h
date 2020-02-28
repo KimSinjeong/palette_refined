@@ -2,6 +2,8 @@
 #define FRAME_H
 
 #include <opencv2/core.hpp>
+#include <opencv2/imgproc.hpp>
+
 #include <vector>
 #include <string>
 #include <mutex>
@@ -65,7 +67,7 @@ public:
         papertoglobaltf = cv::getPerspectiveTransform(paperframe.getMarker(), globalframe.getMarker());
     }
 
-    void calculateRelations(std::vector<cv::Point2f> pBlob);
+    void calculateRelations(std::vector<cv::Point2f>& pBlob);
 
     // Set size of paperframe
     inline void setPaperSize(int s) {
