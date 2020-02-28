@@ -47,16 +47,16 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "mainframe_node");
     ros::start();
 
-    Frame mainframe = Frame();
+    Frame mainframe;
     mainframe.setPaperSize(/* argument here */);
     mainframe.getFrame("global").setReferential(/* argument here (clockwise) */);
 
     // TODO: We should read go board size from setting file and put it in the initializer of Board class
     // TODO: Also read the margin of go board for better recognition of go stones.
-    Board goboard = Board(/* argument here */);
+    Board goboard(/* argument here */);
 
     // TODO: Create classes and Run threads
-    Monitor monitor = Monitor(&mainframe, &goboard);
+    Monitor monitor(&mainframe, &goboard);
     // Intelligence intelligence = Intelligence(...);
     // RobotMover robotmover = RobotMover(...);
 

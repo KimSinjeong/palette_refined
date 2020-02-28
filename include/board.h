@@ -16,7 +16,7 @@ struct Uline {
     float rho;
     float theta;
     int index = 1;
-}
+};
 
 struct Upoint {
     // 각 위치에 돌이 놓였는지, 누구의 돌이 놓였는지 저장
@@ -24,7 +24,7 @@ struct Upoint {
     // baseframe 기준으로 격자점 좌표
     // (paperframe에서 marginS 만큼 원점이 이동한 좌표계)
     cv::Point2f coord;
-}
+};
 
 class Board
 {
