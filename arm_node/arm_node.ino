@@ -17,26 +17,11 @@ const char *LOG[4];
 
 int32_t get_data[4] = {0, };
 
+void move(const std_msgs::UInt16MultiArray&);
+
 ros::NodeHandle nh;
 ros::Subscriber<std_msgs::UInt16MultiArray> sub("arm_node", move);
 DynamixelWorkbench dx[4];
-
-// Handler
-void move(const std_msgs::UInt16MultiArray& joint)
-{
-  //need to error pruning for exception
-  if (0 < joint[0] && joint[0] < 1024
-   && 900 < joint[1] && joint[1] < 3100
-   && 800 < joint[2] && joint[2] < 3200
-   && 200 < joint[3] && joint[3] < 800)
-  {
-    for (int i = 0; i < 4; i++)
-      dx[i].goalPosition(DXID[i], (int32_t)joint[i]);
-  
-    for (int i = 0; i < 4; i++)
-      dx[i].itemRead(DXID[i], "Present_Position", get_data+i, LOG+i);
-  }
-}
 
 void setup()
 {
@@ -67,4 +52,21 @@ void setup()
 void loop() {
   nh.spinOnce();
   delay(1);
+}
+
+// Handler
+void move(const std_msgs::UInt16MultiArray& joint)
+{
+  //need to error pruning for exception
+  if (0 < joint.data[0] && joint.data[0] < 1024
+   && 900 < joint.data[1] && joint.data[1] < 3100
+   && 800 < joint.data[2] && joint.data[2] < 3200
+   && 200 < joint.data[3] && joint.data[3] < 800)
+  {
+    for (int i = 0; i < 4; i++)
+      dx[i].goalPosition(DXID[i], (int32_t)joint.data[i]);
+  
+    for (int i = 0; i < 4; i++)
+      dx[i].itemRead(DXID[i], "Present_Position", get_data+i, LOG+i);
+  }
 }
