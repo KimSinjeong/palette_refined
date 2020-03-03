@@ -20,7 +20,7 @@ int32_t get_data[4] = {0, };
 void move(const std_msgs::UInt16MultiArray&);
 
 ros::NodeHandle nh;
-ros::Subscriber<std_msgs::UInt16MultiArray> sub("arm_node", move);
+ros::Subscriber<std_msgs::UInt16MultiArray> sub("/arm/control_signal", move);
 DynamixelWorkbench dx[4];
 
 void setup()

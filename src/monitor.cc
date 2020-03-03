@@ -214,8 +214,9 @@ void Monitor::Run()
         }
         // There are proper number of markers and corners of Go board;
         //  the order of two evaluations are important!
-        // TODO: 첫번째 조건으로 AI 활동 여부 등의 조건을 나타내는 boolean이 들어가야 함. (pgame->ismonitoractive)
-        if (isMarker(imageframe, paperQR2Rect) && isCorner(imageframe, paperQR2Rect, pBlob))
+        if (pgamemanager->isdetecting
+            && isMarker(imageframe, paperQR2Rect)
+            && isCorner(imageframe, paperQR2Rect, pBlob))
         {
             // Set img <-> paper <-> global relations
             pframe->calculateRelations(pBlob);
@@ -231,6 +232,7 @@ void Monitor::Run()
                 unique_lock<mutex> lock(<<lock 이름 넣기>>);
                 pgame->userupdated++;
                  */
+                pgamemanager->userInput();
             }
         }
         else std::cerr << "There are too many/less markers/corners on image." << std::endl;

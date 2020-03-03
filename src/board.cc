@@ -20,6 +20,7 @@ Board::Board(int size_, int marginX_, int marginY_, int marginE_)
 		memset(gridpt[i], 0, sizeof(Upoint)*size);
 	}
 
+	// 게임 한 판이 끝나고 다음판을 위해서 board 초기화 할 때에도 -1, -1이 되어야 함.
 	recentuser = Point2i(-1, -1);
 }
 
@@ -168,7 +169,7 @@ bool Board::updateUserAction(const int x, const int y)
 {
 	if (gridpt[x][y].status == EMPTY)
 	{
-		// gridpt[x][y].status = RED;
+		gridpt[x][y].status = RED;
 		// 다른 작업에 혼선을 주지 않기 위해 실제로 놓는 것은 나중에
 		// game thread가 감시자 역할을 수행한다. 반칙이 아닐 경우에만 실제로 놓음
 		recentuser.x = x; recentuser.y = y;
@@ -176,12 +177,12 @@ bool Board::updateUserAction(const int x, const int y)
 	}
 	return false;
 }
-
+/*
 void Board::confirmUserAction()
 {
 	gridpt[recentuser.x][recentuser.y].status = RED;
 }
-
+*/
 bool Board::dotDetection()
 {
 	std::vector<KeyPoint> blobPoints;
@@ -235,6 +236,13 @@ void Board::clearBoard()
             gridpt[i][j].status = EMPTY;
         }
     }
+}
+
+void Board::updateAIAction(const int x, const int y, int& px, int& py)
+{
+	gridpt[x][y].status = BLACK;
+	px = x + marginS.x;
+	py = y + marginS.y;
 }
 
 bool Board::isWinner(Stone player)

@@ -3,6 +3,7 @@
 
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
+#include <opencv2/features2d.hpp>
 
 #include <vector>
 #include <string>
@@ -65,6 +66,13 @@ public:
 
     inline void paper2globalRelation() {
         papertoglobaltf = cv::getPerspectiveTransform(paperframe.getMarker(), globalframe.getMarker());
+    }
+
+    inline void paper2globalTF(const int px, const int py, float& gx, float& gy) {
+        std::vector<cv::Point2f> pt(1);
+        pt[0] = cv::Point2f((float)px, (float)py);
+        cv::perspectiveTransform(pt, pt, papertoglobaltf);
+        gx = pt[0].x; gy = pt[0].y;
     }
 
     void calculateRelations(std::vector<cv::Point2f>& pBlob);

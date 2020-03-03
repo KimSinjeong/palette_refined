@@ -3,6 +3,7 @@
 
 #include "frame.h"
 #include "board.h"
+#include "game.h"
 
 #include <mutex>
 #include <vector>
@@ -10,14 +11,15 @@
 class Monitor
 {
 public:
-    Monitor(Frame* pframe_, Board* pboard_)
-        : pframe(pframe_), pboard(pboard_) {}
+    Monitor(Frame* pframe_, Board* pboard_, GameManager* pgamemanager_)
+        : pframe(pframe_), pboard(pboard_), pgamemanager(pgamemanager_) {}
     void Run();
     void Halt();
     
 private:
     Frame* pframe;
     Board* pboard;
+    GameManager* pgamemanager;
 
     bool isrunning;
 

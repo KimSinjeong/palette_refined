@@ -37,7 +37,8 @@ public:
     bool houghDetection();
     void findIntersections();
     bool dotDetection();
-    void confirmUserAction();
+    //void confirmUserAction();
+    void updateAIAction(const int, const int, int&, int&);
 
     // Determine whether there is a winner; if so, return the color of winner.
     bool isWinner(Stone player);
@@ -62,7 +63,7 @@ private:
     // Margin of frame to remove a marker and pieces of points at the corners
     cv::Point2i marginS, marginE;
 
-    // 최근에 둔 돌이 완전히 처리되고 나면 -1, -1 이 된다.
+    // 최근에 둔 돌의 좌표 저장
     cv::Point2i recentuser;
 
     // Lines that are parallel to x axis, y axis, respectively.
