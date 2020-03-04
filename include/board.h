@@ -1,29 +1,16 @@
 #ifndef BOARD_H
 #define BOARD_H
 
+#include "utils.h"
+
 #include <opencv2/core.hpp>
 #include <iostream>
 #include <string.h>
-
-enum Stone 
-{
-    EMPTY,
-    RED,
-    BLACK
-};
 
 struct Uline {
     float rho;
     float theta;
     int index = 1;
-};
-
-struct Upoint {
-    // 각 위치에 돌이 놓였는지, 누구의 돌이 놓였는지 저장
-    Stone status;
-    // baseframe 기준으로 격자점 좌표
-    // (paperframe에서 marginS 만큼 원점이 이동한 좌표계)
-    cv::Point2f coord;
 };
 
 class Board
@@ -40,8 +27,6 @@ public:
     //void confirmUserAction();
     void updateAIAction(const int, const int, int&, int&);
 
-    // Determine whether there is a winner; if so, return the color of winner.
-    bool isWinner(Stone player);
     void clearBoard();
 
     inline void setFrame(cv::Mat frame) {
@@ -49,11 +34,20 @@ public:
                 frame.cols - marginE.x, frame.rows - marginE.y));
     }
 
+    inline int getSize() { return size; }
+
     ~Board();
+
+    // 각 위치에 돌이 놓였는지, 누구의 돌이 놓였는지 저장
+    Stone **status;
 
 private:
     // Information of each points at the go board grid
-    Upoint **gridpt;
+    // Upoint **gridpt;
+    // baseframe 기준으로 격자점 좌표
+    // (paperframe에서 marginS 만큼 원점이 이동한 좌표계)
+    cv::Point2f **coord;
+
     // Size of Go board
     int size;
 

@@ -1,4 +1,5 @@
 #include "game.h"
+#include "utils.h"
 
 #include <vector>
 #include <unistd.h>
@@ -54,10 +55,12 @@ void GameManager::Run()
     isrunning = true;
     while (isrunning)
     {
-        Stone winner;
-        // Run for until a game ends.
-        for (countturn = 0; !(winner = pboard->iswinner()) && !isrunning; countturn++, turn=!(turn-1)+1)
+        // Run do-while until a game ends.
+        int countturn = 0;
+        do
         {
+            if (!countturn) turn=!(turn-1)+1;
+
             if (turn == RED)
             { // Done by human
                 while (!isupdated);
@@ -93,12 +96,14 @@ void GameManager::Run()
                 if (isupdated) // 로봇 두기도 전에 두 번 이상 둬버렸다면 반칙
                     isfoul = true;
                 isdetecting = true; // 충분히 로봇이 범위를 벗어났을 때
-            }            
-        }
+            }
+            countturn++;
+        } while(!isWinner(turn, pboard->status, pboard->getSize()) && !isrunning);
+
         if (!isrunning) break;
         
-        turn = !(winner-1)+1;
-        cout << "The winner is the " << (winner == RED)?"user":"computer" << endl;
+        cout << "The winner is the " << (turn == RED)?"user":"computer" << endl;
+        turn = !(turn-1)+1;
     }
 }
 

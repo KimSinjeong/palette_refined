@@ -12,12 +12,20 @@ Board::Board(int size_, int marginX_, int marginY_, int marginE_)
 	: size(size_), marginS(marginX_, marginY_), marginE(marginE_, marginE_)
 {
 	// Allocate memory for grid points and lines
-    gridpt = new Upoint*[size];
+    status = new Stone*[size];
 	for(int i = 0; i < size; i++)
 	{
-		gridpt[i] = new Upoint[size];
+		status[i] = new Stone[size];
 		// Initialize memory space.
-		memset(gridpt[i], 0, sizeof(Upoint)*size);
+		memset(status[i], 0, sizeof(Stone)*size);
+	}
+
+	coord = new Point2f*[size];
+	for(int i = 0; i < size; i++)
+	{
+		coord[i] = new Point2f[size];
+		// Initialize memory space.
+		memset(coord[i], 0, sizeof(Point2f)*size);
 	}
 
 	// 게임 한 판이 끝나고 다음판을 위해서 board 초기화 할 때에도 -1, -1이 되어야 함.
@@ -27,8 +35,11 @@ Board::Board(int size_, int marginX_, int marginY_, int marginE_)
 Board::~Board()
 {
 	// Free the memory
-	for(int i = 0; i < size; i++) delete [] gridpt[i];
-	delete [] gridpt;
+	for(int i = 0; i < size; i++) delete [] status[i];
+	delete [] status;
+
+	for(int i = 0; i < size; i++) delete [] coord[i];
+	delete [] coord;
 
 	while (x_lines.size())
 	{
@@ -145,8 +156,8 @@ void Board::findIntersections()
 
 			a2 = -x0_j / y0_j;
 			b2 = y0_j - a2 * x0_j;
-			gridpt[i][j].coord.x = (b2 - b1) / (a1 - a2);
-			gridpt[i][j].coord.y = a1 * gridpt[i][j].coord.x + b1;
+			coord[i][j].x = (b2 - b1) / (a1 - a2);
+			coord[i][j].y = a1 * coord[i][j].x + b1;
 		}
 	}
 }
@@ -156,8 +167,8 @@ int Board::findDotIndex(KeyPoint blob)
 	float dx, dy, distance;
 	for (int i = 0; i < 12; i++) {
 		for (int j = 0; j < 12; j++) {
-			dx = blob.pt.x - gridpt[i][j].coord.x;
-			dy = blob.pt.y - gridpt[i][j].coord.y;
+			dx = blob.pt.x - coord[i][j].x;
+			dy = blob.pt.y - coord[i][j].y;
 			distance = sqrt(pow(dx, 2) + pow(dy, 2));
 			if (distance < blob.size) return i * 12 + j;
 		}
@@ -167,9 +178,9 @@ int Board::findDotIndex(KeyPoint blob)
 
 bool Board::updateUserAction(const int x, const int y)
 {
-	if (gridpt[x][y].status == EMPTY)
+	if (status[x][y] == EMPTY)
 	{
-		gridpt[x][y].status = RED;
+		status[x][y] = RED;
 		// 다른 작업에 혼선을 주지 않기 위해 실제로 놓는 것은 나중에
 		// game thread가 감시자 역할을 수행한다. 반칙이 아닐 경우에만 실제로 놓음
 		recentuser.x = x; recentuser.y = y;
@@ -180,7 +191,7 @@ bool Board::updateUserAction(const int x, const int y)
 /*
 void Board::confirmUserAction()
 {
-	gridpt[recentuser.x][recentuser.y].status = RED;
+	[recentuser.x][recentuser.y].status = RED;
 }
 */
 bool Board::dotDetection()
@@ -233,95 +244,14 @@ void Board::clearBoard()
     {
         for (int j = 0; j < size; j++)
         {
-            gridpt[i][j].status = EMPTY;
+            status[i][j] = EMPTY;
         }
     }
 }
 
 void Board::updateAIAction(const int x, const int y, int& px, int& py)
 {
-	gridpt[x][y].status = BLACK;
+	status[x][y] = BLACK;
 	px = x + marginS.x;
 	py = y + marginS.y;
-}
-
-bool Board::isWinner(Stone player)
-{
-    if (player == EMPTY) {
-        std::cerr << "Player is not specified for winner detecting function" << std::endl;
-        return false;
-    }
-
-	int count = 0;
-	int count1 = 0;
-	int count2 = 0;
-	/* Search up and down */
-	for (int j = 0; j < size; j++) {
-		for (int i = 0; i < size; i++) {
-			if (gridpt[i][j].status == player) count++;
-			else count = 0;
-
-			if (count == 5 && i == size-1) return true;
-			if (count == 5 && i < size-1 && gridpt[i + 1][j].status != player) return true;
-            if (count == 5 && i < size-1 && gridpt[i + 1][j].status == player) return false;
-		}
-	}
-
-
-	/* Search left and right */
-	count = 0;
-	for (int i = 0; i < size; i++) {
-		for (int j = 0; j < size; j++) {
-			if (gridpt[i][j].status == player) count++;
-			else count = 0;
-
-			if (count == 5 && j == size-1) return true;
-			if (count == 5 && j < size-1 && gridpt[i][j + 1].status != player) return true;
-			if (count == 5 && j < size-1 && gridpt[i][j + 1].status == player) return false;
-		}
-	}
-
-
-	/* Search diagonal */
-	count1 = 0;
-	count2 = 0;
-	for (int i = 0; i < size-4; i++) {
-		for (int j = 0; j < size - i; j++) {
-			if (gridpt[i + j][j].status == player) count1++;
-			else count1 = 0;
-			if (gridpt[j][i + j].status == player) count2++;
-			else count2 = 0;
-
-			if (count1 == 5 && j == size-1 - i) return true;
-			if (count1 == 5 && j < size-1 - i && gridpt[i + j + 1][j + 1].status != player) return true;
-			if (count1 == 5 && j < size-1 - i && gridpt[i + j + 1][j + 1].status == player) return false;
-			if (count2 == 5 && j == size-1 - i) return true;
-			if (count2 == 5 && j < size-1 - i && gridpt[j + 1][i + j + 1].status != player) return true;
-			if (count2 == 5 && j < size-1 - i && gridpt[j + 1][i + j + 1].status == player) return false;
-
-		}
-	}
-
-
-	/* Search skew diagonal */
-	count1 = 0;
-	count2 = 0;
-	for (int i = size-1; i > 3; i--) {
-		for (int j = 0; j < i + 1; j++) {
-			if (gridpt[i - j][j].status == player) count1++;
-			else count1 = 0;
-			if (gridpt[size-1 - j][size-1 - i + j].status == player) count2++;
-			else count2 = 0;
-
-			if (count1 == 5 && j == i) return true;
-			if (count1 == 5 && j < i && gridpt[i - j - 1][j + 1].status != player) return true;
-			if (count1 == 5 && j < i && gridpt[i - j - 1][j + 1].status == player) return false;
-			if (count2 == 5 && j == i) return true;
-			if (count2 == 5 && j < i && gridpt[size-1 - j - 1][size-1 - i + j + 1].status != player) return true;
-			if (count2 == 5 && j < i && gridpt[size-1 - j - 1][size-1 - i + j + 1].status == player) return false;
-
-		}
-	}
-
-	return false;
 }
